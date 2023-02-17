@@ -6,7 +6,7 @@
     <h1>{{__('categories.order_edit')}}</h1>
     <form action="{{route('orders.update', $order)}}" method="post">
         @method('PUT')
-        <x-forms.inputs :model="$order ?? (new \App\Models\Order())" fields="user_id,shipping_address_id,billing_address_id,status_id"/>
+        <x-forms.inputs :model="$order ?? (new \App\Models\Orders())" fields="user_id,shipping_address_id,billing_address_id,status_id"/>
         <hr>
         <input type="submit" class="waves-effect waves-light btn" value="SEND">
         @csrf

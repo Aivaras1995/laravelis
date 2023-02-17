@@ -6,9 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OrdersRequest;
 use App\Models\Orders;
 use App\Models\Status;
+use App\Models\User;
 
 class OrdersController extends Controller
 {
+    public function __construct ()
+    {
+        $this->authorizeResource(Orders::class);
+    }
     public function index()
     {
         $orders = Orders::all();
