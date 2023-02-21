@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use function Symfony\Component\String\s;
 
 /**
  * Class User
@@ -22,26 +21,29 @@ use function Symfony\Component\String\s;
  * @property string $password
  * @property string $role
  * @property string $remember_token
+ * @property Person $person
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use Notifiable;
 
-    public const ROLE_ADMIN = 'admin';
-    public const ROLE_USER = 'user';
+    public const ROLE_ADMIN   = 'admin';
+    public const ROLE_USER    = 'user';
     public const ROLE_MANAGER = 'manager';
-    public const ROLE_PM = 'prod_manager';
+    public const ROLE_PM      = 'prod_manager';
 
     public const ROLES = [
         self::ROLE_ADMIN,
         self::ROLE_USER,
         self::ROLE_MANAGER,
-        self:: ROLE_PM
+        self::ROLE_PM,
     ];
 
     public const ROLE_DEFAULT = self::ROLE_USER;
+
 
     protected $guarded = [
         'role',
@@ -52,8 +54,6 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array<int, string>
      */
-
-
     protected $fillable = [
         'name',
         'email',
@@ -79,14 +79,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    public function person(): HasMany
+    public function person(): HasOne
     {
-        return $this->hasMany(Person::class);
-    }
-
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Orders::class);
+        return $this->hasOne(Person::class);
     }
 
     public function addresses(): HasMany
@@ -94,10 +89,41 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Address::class);
     }
 
-    public function getRole (): string
+    public function getInitials(): string
     {
-        return $this->role;
+        $parts    = explode(' ', $this->person);
+        $initials = '';
+        foreach ($parts as $part) {
+            $initials .= mb_substr($part, 0, 1);
+        }
+        return $initials;
+    }
+
+    public function getLatestCart(): Orders
+    {
+        $status = Status::where(['name' => Orders::STATUS_NEW, 'type' => 'order'])->first();
+
+        $order = $this?->orders()?->where('status_id', $status->id)?->latest()?->first();
+
+        if (!isset($order) || !$order instanceof Orders) {
+            $order = new Orders();
+            $order->user_id = $this->id;
+            $order->status_id = $status->id;
+            $order->save();
+        }
+
+//        $order = Order::firstOrCreate(['status_id', $status->id, 'user_id' => $this->id]);
+
+        return $order;
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Orders::class);
+    }
+
+    public function __toString(): string
+    {
+        return '[' . $this->name . '] ' . $this->person;
     }
 }
-
-
