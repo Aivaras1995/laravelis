@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-class Orders extends Model
+class Order extends Model
 {
     public const STATUS_NEW = 'Naujas';
 
@@ -62,7 +62,7 @@ class Orders extends Model
 
     public function details(): HasMany
     {
-        return $this->hasMany(OrderDetails::class);
+        return $this->HasMany (OrderDetails::class);
     }
 
     public function products(): HasManyThrough

@@ -46,6 +46,6 @@ class Person extends Model
     }
     public function orders(): HasMany
     {
-        return $this->hasMany(related: Orders::class);
+        return $this->hasMany(related: Order::class);
     }
 }

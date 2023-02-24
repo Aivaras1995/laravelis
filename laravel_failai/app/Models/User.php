@@ -99,14 +99,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $initials;
     }
 
-    public function getLatestCart(): Orders
+    public function getLatestCart(): Order
     {
-        $status = Status::where(['name' => Orders::STATUS_NEW, 'type' => 'order'])->first();
+        $status = Status::where(['name' => Order::STATUS_NEW, 'type' => 'order'])->first();
 
         $order = $this?->orders()?->where('status_id', $status->id)?->latest()?->first();
 
-        if (!isset($order) || !$order instanceof Orders) {
-            $order = new Orders();
+        if (!isset($order) || !$order instanceof Order) {
+            $order = new Order();
             $order->user_id = $this->id;
             $order->status_id = $status->id;
             $order->save();
@@ -114,12 +114,32 @@ class User extends Authenticatable implements MustVerifyEmail
 
 //        $order = Order::firstOrCreate(['status_id', $status->id, 'user_id' => $this->id]);
 
-        return $order;
+        return $order ?? new Order();
     }
 
     public function orders(): HasMany
     {
-        return $this->hasMany(Orders::class);
+        return $this->hasMany(Order::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isManager(): bool
+    {
+        return $this->role === self::ROLE_MANAGER;
+    }
+
+    public function isPM(): bool
+    {
+        return $this->role === self::ROLE_PM;
+    }
+
+    public function isPersonnel(): bool
+    {
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_MANAGER, self::ROLE_PM]);
     }
 
     public function __toString(): string

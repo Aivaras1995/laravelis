@@ -26,26 +26,13 @@
           method="post"
           enctype="multipart/form-data">
 
-        <input type="text" name="name" placeholder="Name" value="{{old('name') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="slug" placeholder="Slug" value="{{old('slug') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="description" placeholder="Description" value="{{old('description') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="image" placeholder="Image" value="{{old('image') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="category_id" placeholder="Category ID" value="{{old('category_id') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="color" placeholder="Color" value="{{old('color') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="size" placeholder="Size" value="{{old('size') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="price" placeholder="Price" value="{{old('price') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <input type="text" name="status_id" placeholder="Status ID" value="{{old('status_id') ?? $product?->name}}"
-               class="@error('name') is-invalid @enderror"><br>
-        <hr>
-        <input type="submit" class="waves-effect waves-light btn" value="Sukurti naują įrašą">
+        @if($product)
+            @method('PUT')
+        @endif
+        <x-forms.inputs :model="$product ?? (new \App\Models\Product())"
+                        fields="name,slug,description,category_id,color,size,price,status_id"/>
+        <input type="file" name="foto">
+        <input type="submit" class="waves-effect waves-light btn" value="SEND">
         @csrf
     </form>
 @endsection

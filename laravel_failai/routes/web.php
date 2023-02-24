@@ -13,17 +13,24 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\IsPersonnel;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
 
 Route::group(['middleware' => SetLocale::class], function () {
-    Route::get('/', HomeController::class);
+    Route::get('/', HomeController::class)->name('home');
     Route::get('/product/{product:slug}', [ProductController::class, 'show'])->name('product.show');
     Route::get('/category/{category:slug}', [CategoryController::class, 'show'])->name('category.show');
-    Route::post('products/add', [CartController::class, 'create'])->name('products.add_to_cart');
 
-    Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified']], function () {
+    Route::group(['prefix' => 'cart'], function () {
+        Route::get('/', [CartController::class, 'show'])->name('order.cart');
+        Route::post('product/add', [CartController::class, 'create'])->name('product.add_to_cart');
+        Route::post('product/{product}/update', [CartController::class, 'update'])->name('cart.product_update');
+        Route::delete('product/{product}/delete', [CartController::class, 'destroy'])->name('cart.product_remove');
+    });
+
+    Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'verified', IsPersonnel::class]], function () {
         Route::get('/', DashBoardController::class)->name('dashboard');
         Route::delete('/product/file/{file}', [ProductsController::class, 'destroyFile'])->name('product.destroy-file');
         Route::resources([

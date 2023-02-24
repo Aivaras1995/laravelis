@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $order_id
  * @property string $product_name
  * @property int $product_id
+ * @property Products $product
  * @property int $quantity
  * @property string $price
  * @property int $status_id
@@ -20,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class OrderDetails extends Model
 {
+    use HasFactory;
+
     protected $guarded = [
         'status_id',
     ];
@@ -34,7 +38,7 @@ class OrderDetails extends Model
 
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Orders::class);
+        return $this->belongsTo(Order::class);
     }
 
     public function product(): BelongsTo

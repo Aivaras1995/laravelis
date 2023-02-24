@@ -2,32 +2,36 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\OrderCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrdersRequest;
-use App\Models\Orders;
+use App\Models\Order;
 use App\Models\Status;
-use App\Models\User;
 
 class OrdersController extends Controller
 {
     public function __construct ()
     {
-        $this->authorizeResource(Orders::class);
+        $this->authorizeResource(Order::class);
     }
     public function index()
     {
-        $orders = Orders::all();
+        $orders = Order::all();
         return view('orders.index', compact('orders'));
     }
 
     public function store(OrdersRequest $request)
     {
-        $order = Orders::create(
+        $order = Order::create(
             $request->all()
             + [
-                'status_id' => Status::query()->where(['type' => 'order', 'name' => 'Naujas'])->first()->id,
+                'status_id' => Status::query()->where(['type' => 'order', 'name' => Status::STATE_NEW])->first()->id,
             ],
         );
+        $this->dispatch(new OrderCreated($order));
+
+        //pvz Perkelti uzsakyma i VMI sistema
+
         return redirect()->route('orders.show', $order);
     }
 
@@ -36,23 +40,23 @@ class OrdersController extends Controller
         return view('orders.create');
     }
 
-    public function show(Orders $order)
+    public function show(Order $order)
     {
         return view('orders.show', compact('order'));
     }
 
-    public function edit(Orders $order)
+    public function edit(Order $order)
     {
         return view('orders.edit', compact('order'));
     }
 
-    public function update(OrdersRequest $request, Orders $order)
+    public function update(OrdersRequest $request, Order $order)
     {
         $order->update($request->all());
         return redirect()->route('orders.show', $order);
     }
 
-    public function destroy(Orders $order)
+    public function destroy(Order $order)
     {
         $order->delete();
         return redirect()->route('orders.index');

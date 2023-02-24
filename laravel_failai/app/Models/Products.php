@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class Products
+ * Class Product
  * @package App\Models
  *
  * @property int $id
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Products extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     public const COLORS = ['Red', 'Green', 'Blue', 'Black', 'White'];
@@ -61,7 +63,7 @@ class Products extends Model
     public function images(): HasMany
     {
         return $this->hasMany(File::class, 'model_id', 'id')
-            ->where('model_type', Products::class)
+            ->where('model_type', Product::class)
             ->whereIn('extension', File::TYPES_IMAGE);
     }
 

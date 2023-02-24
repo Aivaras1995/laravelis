@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Orders;
+use App\Models\Order;
 use App\Policies\OrdersPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -14,7 +14,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Orders::class => OrdersPolicy::class,
+        Order::class => OrdersPolicy::class,
     ];
 
     /**
